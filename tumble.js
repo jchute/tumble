@@ -42,6 +42,11 @@ class Tumble {
     this.addControls( this.element, this.props );
   }
 
+  destroy() {
+    this.controls.remove();
+    this.removeClasses( this.element, this.props );
+  }
+
   addClasses( element, props ) {
     // Add Classes
     element.classList.add( props.class );
@@ -50,6 +55,17 @@ class Tumble {
     Array.from( element.children ).forEach( ( child, i ) => {
       child.classList.add( props.classSlide );
       child.dataset.slide = i;
+    } );
+  }
+
+  removeClasses( element, props ) {
+    element.classList.remove( props.class );
+    element.firstElementChild.classList.add( props.classSlideActive );
+
+    Array.from( element.children ).forEach( child => {
+      child.classList.remove( props.classSlide );
+      child.classList.remove( props.classSlideActive );
+      delete child.dataset.slide;
     } );
   }
 
@@ -86,6 +102,7 @@ class Tumble {
     }
 
     if ( controls.children.length ) {
+      this.controls = controls;
       element.appendChild( controls );
     }
   }
