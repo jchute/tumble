@@ -1,0 +1,58 @@
+.tumble {
+  padding: 0 100px 1em;
+  position: relative;
+}
+
+.tumble__controls {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  bottom: 0;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 100px auto 100px;
+      grid-template-columns: 100px auto 100px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.tumble__controls button {
+  cursor: pointer;
+}
+
+.tumble__pagination {
+  -ms-grid-row-align: end;
+      align-self: end;
+  display: -ms-grid;
+  display: grid;
+  grid-auto-columns: fit-content(100%);
+  grid-auto-flow: column;
+  grid-gap: 0.25em;
+  list-style: none;
+  -ms-grid-column-align: center;
+      justify-self: center;
+  padding: 0;
+  margin: 0;
+}
+
+.tumble__pagination button {
+  background-color: #FACADE;
+  border: 0;
+  border-radius: 50%;
+  height: 1em;
+  padding: 0;
+  -webkit-transition: background-color 250ms ease-in-out;
+  transition: background-color 250ms ease-in-out;
+  width: 1em;
+}
+
+.tumble__pagination button:hover {
+  background-color: #CAB;
+}
+
+.tumble__pagination--active button {
+  background-color: #DECADE;
+}
+/*# sourceMappingURL=tumble.css.map */

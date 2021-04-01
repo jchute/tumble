@@ -1,0 +1,51 @@
+.tumble {
+    padding: 0 100px 1em;
+    position: relative;
+
+    &__controls {
+        align-items: center;
+        bottom: 0;
+        display: grid;
+        grid-template-columns: 100px auto 100px;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        button {
+            cursor: pointer;
+        }
+    }
+
+    &__pagination {
+        align-self: end;
+        display: grid;
+        grid-auto-columns: fit-content( 100% );
+        grid-auto-flow: column;
+        grid-gap: 0.25em;
+        list-style: none;
+        justify-self: center;
+        padding: 0;
+        margin: 0;
+
+        button {
+            background-color: #FACADE;
+            border: 0;
+            border-radius: 50%;
+            height: 1em;
+            padding: 0;
+            transition: background-color 250ms ease-in-out;
+            width: 1em;
+
+            &:hover {
+                background-color: #CAB;
+            }
+        }
+
+        &--active {
+            button {
+                background-color: #DECADE;
+            }
+        }
+    }
+}
