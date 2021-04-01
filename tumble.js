@@ -19,9 +19,10 @@ class Tumble {
       classPaginationActive: 'tumble__pagination--active',
       classSlide: 'tumble__slide',
       classSlideActive: 'tumble__slide--active',
-      controlNext: '<button class="tumble__controls--next" aria-label="Next Slide"></button>',
-      controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide"></button>',
+      controlNext: '<button class="tumble__controls--next" aria-label="Next Slide">Next</button>',
+      controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide">Previous</button>',
       controlPaginationLabel: 'Show Slide',
+      enableCSS: true,
       showControls: true,
       showPagination: true,
       ...props
@@ -73,12 +74,6 @@ class Tumble {
     const controls = document.createElement( 'nav' );
     controls.classList.add( props.classControls );
 
-    // Add Next/Prev Controls
-    if ( props.showControls ) {
-      controls.innerHTML += props.controlPrev;
-      controls.innerHTML += props.controlNext;
-    }
-
     // Add Pagination Controls 
     if ( props.showPagination ) {
       const ul = document.createElement( 'ul' );
@@ -101,10 +96,15 @@ class Tumble {
       controls.appendChild( ul );
     }
 
+    // Add Next/Prev Controls
+    if ( props.showControls ) {
+      controls.innerHTML = props.controlPrev + controls.innerHTML;
+      controls.innerHTML += props.controlNext;
+    }
+
     if ( controls.children.length ) {
       this.controls = controls;
       element.appendChild( controls );
     }
   }
-
 }
