@@ -22,6 +22,7 @@ class Tumble {
       controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide">Previous</button>',
       controlPaginationLabel: 'Show Slide',
       enableCSS: true,
+      initialSlide: 0,
       showControls: true,
       showPagination: true,
       ...props
@@ -38,6 +39,7 @@ class Tumble {
   }
 
   build() {
+    this.activeSlide = this.element.children[this.props.initialSlide];
     this.addClasses();
     this.addControls();
     this.addEvents();
@@ -59,9 +61,9 @@ class Tumble {
     this.element.classList.add( this.props.class );
     Array.from( this.element.children ).forEach( ( child, i ) => {
       child.classList.add( this.props.classSlide );
-      child.dataset.slide = i;
+      child.dataset.slide = i+1;
     } );
-    this.element.children[0].classList.add( this.props.classSlideActive );
+    this.activeSlide.classList.add( this.props.classSlideActive );
   }
 
   removeData() {
@@ -71,7 +73,7 @@ class Tumble {
       child.classList.remove( this.props.classSlideActive );
       delete child.dataset.slide;
     } );
-    this.element.children[0].classList.add( this.props.classSlideActive );
+    this.activeSlide.classList.remove( this.props.classSlideActive );
   }
 
   addControls() {
@@ -80,6 +82,8 @@ class Tumble {
     if ( this.props.showControls ) {
       this.prev = this.createElementFromHTML( this.props.controlPrev );
       this.next = this.createElementFromHTML( this.props.controlNext );
+      this.prev.dataset.slide = 3;
+      this.next.dataset.slide = 2;
       this.element.appendChild( this.prev );
       this.element.appendChild( this.next );
     }
@@ -101,7 +105,7 @@ class Tumble {
           index++;
         }
       } );
-      this.page.children[0].classList.add( this.props.classPaginationActive );
+      this.page.children[this.props.initialSlide].classList.add( this.props.classPaginationActive );
 
       this.element.appendChild( this.page );
     }
@@ -115,7 +119,13 @@ class Tumble {
   }
 
   setSlide( element ) {
-    console.log( element.dataset.slide );
+    this.activeSlide.classList.remove( this.props.classSlideActive );
+    Array.from( this.element.children ).forEach( child => {
+      if ( child.dataset.slide == element.dataset.slide ) {
+        this.activeSlide = child;
+        child.classList.add( this.props.classSlideActive );
+      }
+    } );
   }
 
   addEvents() {
