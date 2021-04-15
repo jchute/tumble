@@ -1,6 +1,6 @@
 /*
  * Tumble
- * Version: 0.1
+ * Version: 0.2
  * License: MIT License
  * Author: Jonathan Chute
  * 
@@ -28,6 +28,7 @@ class Tumble {
       controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide">Previous</button>',
       controlPaginationLabel: 'Show Slide',
       initialSlide: 0,
+      rotate: true,
       showControls: true,
       showPagination: true,
       timeout: 5000,
@@ -246,7 +247,9 @@ class Tumble {
 
     this.activeSlide = id;
 
-    this.setAutomate();
+    if ( this.props.rotate ) {
+      this.setAutomate();
+    }
 
     return updatedSlide;
   }
