@@ -1,25 +1,43 @@
 .tumble {
-    padding: 0 100px 1em;
+    align-items: center;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-areas:
+        'prev slide next'
+        'page page page';
+    grid-template-columns: 100px 1fr 100px;
+    overflow: hidden;
     position: relative;
 
-    &__controls {
-        align-items: center;
-        bottom: 0;
-        display: grid;
-        grid-template-columns: 100px auto 100px;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
+    button {
+        cursor: pointer;
+    }
 
-        button {
-            cursor: pointer;
+    &__slide {
+        grid-area: slide;
+        opacity: 0;
+        position: relative;
+
+        &--active {
+            opacity: 1;
+            z-index: 1;
+        }
+    }
+
+    &__controls {
+        &--prev {
+            grid-area: prev;
+        }
+
+        &--next {
+            grid-area: next;
         }
     }
 
     &__pagination {
         align-self: end;
         display: grid;
+        grid-area: page;
         grid-auto-columns: fit-content( 100% );
         grid-auto-flow: column;
         grid-gap: 0.25em;

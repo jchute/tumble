@@ -14,7 +14,6 @@ class Tumble {
     this.element = element;
     this.props = {
       class: 'tumble',
-      classControls: 'tumble__controls',
       classPagination: 'tumble__pagination',
       classPaginationActive: 'tumble__pagination--active',
       classSlide: 'tumble__slide',
@@ -26,7 +25,7 @@ class Tumble {
       showControls: true,
       showPagination: true,
       ...props
-    }
+    };
 
     // Break Early if Error
     if ( ! ( element && element.nodeType === 1 ) ) {
@@ -39,72 +38,70 @@ class Tumble {
   }
 
   build() {
-    this.addClasses( this.element, this.props );
-    this.addControls( this.element, this.props );
+    this.addClasses();
+    this.addControls();
   }
 
   destroy() {
-    this.controls.remove();
-    this.removeClasses( this.element, this.props );
+    this.removeData();
   }
 
-  addClasses( element, props ) {
-    // Add Classes
-    element.classList.add( props.class );
-    element.firstElementChild.classList.add( props.classSlideActive );
+  createElementFromHTML( html ) {
+    const container = document.createElement( 'div' );
+    container.innerHTML = html;
+    return container.children[0];
+  }
 
-    Array.from( element.children ).forEach( ( child, i ) => {
-      child.classList.add( props.classSlide );
+  addClasses() {
+    this.element.classList.add( this.props.class );
+    Array.from( this.element.children ).forEach( ( child, i ) => {
+      child.classList.add( this.props.classSlide );
       child.dataset.slide = i;
     } );
+    this.element.children[0].classList.add( this.props.classSlideActive );
   }
 
-  removeClasses( element, props ) {
-    element.classList.remove( props.class );
-    element.firstElementChild.classList.add( props.classSlideActive );
-
-    Array.from( element.children ).forEach( child => {
-      child.classList.remove( props.classSlide );
-      child.classList.remove( props.classSlideActive );
+  removeData() {
+    this.element.classList.remove( this.props.class );
+    Array.from( this.element.children ).forEach( child => {
+      child.classList.remove( this.props.classSlide );
+      child.classList.remove( this.props.classSlideActive );
       delete child.dataset.slide;
     } );
+    this.element.children[0].classList.add( this.props.classSlideActive );
   }
 
-  addControls( element, props ) {
-    const controls = document.createElement( 'nav' );
-    controls.classList.add( props.classControls );
-
-    // Add Pagination Controls 
-    if ( props.showPagination ) {
-      const ul = document.createElement( 'ul' );
-      ul.classList.add( props.classPagination );
-
-      for ( let i = 0; i < element.children.length; i++ ) {
-        const li = document.createElement( 'li' );
-        const button = document.createElement( 'button' );
-        button.setAttribute( 'aria-label', `${props.controlPaginationLabel} ${i}` );
-        button.dataset.slide = i;
-
-        if ( i == 0 ) {
-          li.classList.add( props.classPaginationActive );
-        }
-
-        li.appendChild( button );
-        ul.appendChild( li );
-      }
-
-      controls.appendChild( ul );
-    }
+  addControls() {
 
     // Add Next/Prev Controls
-    if ( props.showControls ) {
-      controls.innerHTML = props.controlPrev + controls.innerHTML;
-      controls.innerHTML += props.controlNext;
+    if ( this.props.showControls ) {
+      this.prev = this.createElementFromHTML( this.props.controlPrev );
+      this.next = this.createElementFromHTML( this.props.controlNext );
+      this.element.appendChild( this.prev );
+      this.element.appendChild( this.next );
     }
 
-    if ( controls.children.length ) {
-      this.controls = controls;
-      element.appendChild( controls );
+    // Add Pagination Controls 
+    if ( this.props.showPagination ) {
+      this.page = document.createElement( 'ul' );
+      this.page.classList.add( this.props.classPagination );
+      
+      let index = 1;
+      Array.from( this.element.children ).forEach( child => {
+        if ( child.classList.contains( this.props.classSlide ) ) {
+          const li = document.createElement( 'li' );
+          const button = document.createElement( 'button' );
+          button.setAttribute( 'aria-label', `${this.props.controlPaginationLabel} ${index}` );
+          button.dataset.slide = index;
+          li.appendChild( button );
+          this.page.appendChild( li );
+          index++;
+        }
+      } );
+      this.page.children[0].classList.add( this.props.classPaginationActive );
+
+      this.element.appendChild( this.page );
     }
+
   }
 }
