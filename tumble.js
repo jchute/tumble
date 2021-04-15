@@ -119,22 +119,33 @@ class Tumble {
   }
 
   removeControls() {
-    this.prev.remove();
-    this.next.remove();
-    this.page.remove();
+    if ( this.prev ) {
+      this.prev.remove();
+    }
+
+    if ( this.next ) {
+      this.next.remove();
+    }
+
+    if ( this.page ) {
+      this.page.remove();
+    }
   }
 
   setSlides() {
     this.slides = this.element.querySelectorAll( `.${this.props.classSlide}` );
-    this.dots = this.page.querySelectorAll( 'button' );
 
     this.slides.forEach( ( slide, index ) => {
       slide.dataset.slide = index;
     } );
 
-    this.dots.forEach( ( dot, index ) => {
-      dot.dataset.slide = index;
-    } );
+    if ( this.dots ) {
+      this.dots = this.page.querySelectorAll( 'button' );
+
+      this.dots.forEach( ( dot, index ) => {
+        dot.dataset.slide = index;
+      } );
+    }
 
     this.setActiveSlide( this.props.initialSlide );
   }
