@@ -40,10 +40,13 @@ class Tumble {
   build() {
     this.addClasses();
     this.addControls();
+    this.addEvents();
   }
 
   destroy() {
     this.removeData();
+    this.removeControls();
+    this.removeEvents();
   }
 
   createElementFromHTML( html ) {
@@ -103,5 +106,62 @@ class Tumble {
       this.element.appendChild( this.page );
     }
 
+  }
+
+  removeControls() {
+    this.prev.remove();
+    this.next.remove();
+    this.page.remove();
+  }
+
+  setSlide( element ) {
+    console.log( element.dataset.slide );
+  }
+
+  addEvents() {
+    if ( this.prev ) {
+      const tumble = this;
+      this.prev.addEventListener( 'click', this.prevSlide = function() {
+        tumble.setSlide( this );
+      } );
+    }
+
+    if ( this.next ) {
+      const tumble = this;
+      this.next.addEventListener( 'click', this.nextSlide = function() {
+        tumble.setSlide( this );
+      } );
+    }
+
+    if ( this.page ) {
+      const tumble = this;
+      let index = 0;
+      this.pageSlide = [];
+      this.page.querySelectorAll( 'button' ).forEach( button => {
+        button.addEventListener( 'click', this.pageSlide[index++] = function() {
+          tumble.setSlide( this );
+        } );
+      } );
+    }
+  }
+
+  removeEvents() {
+    if ( this.prev ) {
+      this.prev.removeEventListener( 'click', this.prevSlide );
+      delete this.prevSlide;
+    }
+
+    if ( this.next ) {
+      this.next.removeEventListener( 'click', this.nextSlide );
+      delete this.nextSlide;
+    }
+
+    if ( this.page ) {
+      let index = 0;
+      this.page.querySelectorAll( 'button' ).forEach( button => {
+        button.removeEventListener( 'click', this.pageSlide[index++] );
+      } );
+      delete this.pageSlide;
+    }
   }
 }
