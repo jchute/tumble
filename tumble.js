@@ -73,7 +73,7 @@ class Tumble {
     this.element.classList.add( this.props.class );
 
     // Add class to each slide
-    Array.from( this.element.children ).forEach( ( child, i ) => {
+    Array.from( this.element.children ).forEach( child => {
       child.classList.add( this.props.classSlide );
     } );
   }
@@ -115,6 +115,7 @@ class Tumble {
       } );
 
       this.element.appendChild( this.page );
+      this.pageButtons = this.page.querySelectorAll( 'button' );
     }
   }
 
@@ -139,11 +140,9 @@ class Tumble {
       slide.dataset.slide = index;
     } );
 
-    if ( this.dots ) {
-      this.dots = this.page.querySelectorAll( 'button' );
-
-      this.dots.forEach( ( dot, index ) => {
-        dot.dataset.slide = index;
+    if ( this.page ) {
+      this.pageButtons.forEach( ( button, index ) => {
+        button.dataset.slide = index;
       } );
     }
 
@@ -215,9 +214,9 @@ class Tumble {
     return found;
   }
 
-  getDot( id ) {
+  getPageButton( id ) {
     let found = null;
-    this.dots.forEach( button => {
+    this.pageButtons.forEach( button => {
       if ( button.dataset.slide == id ) {
         found = button;
       }
@@ -239,15 +238,15 @@ class Tumble {
 
     updatedSlide.classList.add( this.props.classSlideActive );
 
-    if ( this.props.showPagination ) {
-      const currentDot = this.getDot( this.activeSlide );
-      const updatedDot = this.getDot( id );
+    if ( this.page ) {
+      const currentPageButton = this.getPageButton( this.activeSlide );
+      const updatedPageButton = this.getPageButton( id );
 
-      if ( currentDot ) {
-        currentDot.parentElement.classList.remove( this.props.classPaginationActive );
+      if ( currentPageButton ) {
+        currentPageButton.parentElement.classList.remove( this.props.classPaginationActive );
       }
 
-      updatedDot.parentElement.classList.add( this.props.classPaginationActive );
+      updatedPageButton.parentElement.classList.add( this.props.classPaginationActive );
     }
 
     // Update the slide for the Next/Prev button to switch into
