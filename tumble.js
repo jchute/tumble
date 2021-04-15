@@ -1,6 +1,6 @@
 /*
  * Tumble
- * Version: 0.1
+ * Version: 0.2
  * License: MIT License
  * Author: Jonathan Chute
  * 
@@ -28,8 +28,10 @@ class Tumble {
       controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide">Previous</button>',
       controlPaginationLabel: 'Show Slide',
       initialSlide: 0,
+      rotate: true,
       showControls: true,
       showPagination: true,
+      timeout: 5000,
       ...props
     };
 
@@ -39,14 +41,15 @@ class Tumble {
 
   build() {
     this.addHTML();
-    this.addEvents();
     this.setSlides();
+    this.addEvents();
   }
 
   destroy() {
     this.removeHTML();
-    this.removeEvents();
     this.unsetSlides();
+    this.removeEvents();
+    clearTimeout( this.automate );
   }
 
   createElementFromHTML( html ) {
@@ -236,14 +239,25 @@ class Tumble {
       updatedDot.parentElement.classList.add( this.props.classPaginationActive );
     }
 
-    this.activeSlide = id;
-
     // Update the slide for the Next/Prev button to switch into
     if ( this.props.showControls ) {
-      this.prev.dataset.slide = this.activeSlide == 0 ? this.slides.length - 1 : parseInt( this.activeSlide ) - 1;
-      this.next.dataset.slide = this.activeSlide == this.slides.length - 1 ? 0 : parseInt( this.activeSlide ) + 1;
+      this.prev.dataset.slide = id == 0 ? this.slides.length - 1 : parseInt( id ) - 1;
+      this.next.dataset.slide = id == this.slides.length - 1 ? 0 : parseInt( id ) + 1;
+    }
+
+    this.activeSlide = id;
+
+    if ( this.props.rotate ) {
+      this.setAutomate();
     }
 
     return updatedSlide;
+  }
+
+  setAutomate() {
+    clearTimeout( this.automate );
+    this.automate = setTimeout( () => {
+      this.setActiveSlide( this.next.dataset.slide );
+    }, this.props.timeout );
   }
 }
