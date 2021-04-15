@@ -10,6 +10,12 @@ class Tumble {
   
   constructor( element, props ) {
 
+    // Break Early if Error
+    if ( ! ( element && element.nodeType === 1 ) ) {
+      console.warn( `Tumble can only be applied to an HTMLElement object. Target received: ${element}` );
+      return;
+    }
+
     // Initialize Variables and Settings
     this.element = element;
     this.props = {
@@ -21,34 +27,26 @@ class Tumble {
       controlNext: '<button class="tumble__controls--next" aria-label="Next Slide">Next</button>',
       controlPrev: '<button class="tumble__controls--prev" aria-label="Previous Slide">Previous</button>',
       controlPaginationLabel: 'Show Slide',
-      enableCSS: true,
       initialSlide: 0,
       showControls: true,
       showPagination: true,
       ...props
     };
 
-    // Break Early if Error
-    if ( ! ( element && element.nodeType === 1 ) ) {
-      console.warn( `Tumble can only be applied to an HTMLElement object. Target received: ${element}` );
-      return;
-    }
-
     this.build();
 
   }
 
   build() {
-    this.activeSlide = this.element.children[this.props.initialSlide];
-    this.addClasses();
-    this.addControls();
+    this.addHTML();
     this.addEvents();
+    this.setSlides();
   }
 
   destroy() {
-    this.removeData();
-    this.removeControls();
+    this.removeHTML();
     this.removeEvents();
+    this.unsetSlides();
   }
 
   createElementFromHTML( html ) {
@@ -57,33 +55,42 @@ class Tumble {
     return container.children[0];
   }
 
-  addClasses() {
-    this.element.classList.add( this.props.class );
-    Array.from( this.element.children ).forEach( ( child, i ) => {
-      child.classList.add( this.props.classSlide );
-      child.dataset.slide = i+1;
-    } );
-    this.activeSlide.classList.add( this.props.classSlideActive );
+  addHTML() {
+    this.addClasses();
+    this.addControls();
   }
 
-  removeData() {
+  removeHTML() {
+    this.removeClasses();
+    this.removeControls();
+  }
+
+  addClasses() {
+    // Add class to main element
+    this.element.classList.add( this.props.class );
+
+    // Add class to each slide
+    Array.from( this.element.children ).forEach( ( child, i ) => {
+      child.classList.add( this.props.classSlide );
+    } );
+  }
+
+  removeClasses() {
+    // Remove class from main element
     this.element.classList.remove( this.props.class );
+
+    // Remove class from each slide
     Array.from( this.element.children ).forEach( child => {
       child.classList.remove( this.props.classSlide );
       child.classList.remove( this.props.classSlideActive );
-      delete child.dataset.slide;
     } );
-    this.activeSlide.classList.remove( this.props.classSlideActive );
   }
 
   addControls() {
-
     // Add Next/Prev Controls
     if ( this.props.showControls ) {
       this.prev = this.createElementFromHTML( this.props.controlPrev );
       this.next = this.createElementFromHTML( this.props.controlNext );
-      this.prev.dataset.slide = 3;
-      this.next.dataset.slide = 2;
       this.element.appendChild( this.prev );
       this.element.appendChild( this.next );
     }
@@ -93,23 +100,19 @@ class Tumble {
       this.page = document.createElement( 'ul' );
       this.page.classList.add( this.props.classPagination );
       
-      let index = 1;
+      let index = 0;
       Array.from( this.element.children ).forEach( child => {
         if ( child.classList.contains( this.props.classSlide ) ) {
           const li = document.createElement( 'li' );
           const button = document.createElement( 'button' );
-          button.setAttribute( 'aria-label', `${this.props.controlPaginationLabel} ${index}` );
-          button.dataset.slide = index;
+          button.setAttribute( 'aria-label', `${this.props.controlPaginationLabel} ${++index}` );
           li.appendChild( button );
           this.page.appendChild( li );
-          index++;
         }
       } );
-      this.page.children[this.props.initialSlide].classList.add( this.props.classPaginationActive );
 
       this.element.appendChild( this.page );
     }
-
   }
 
   removeControls() {
@@ -118,28 +121,41 @@ class Tumble {
     this.page.remove();
   }
 
-  setSlide( element ) {
-    this.activeSlide.classList.remove( this.props.classSlideActive );
-    Array.from( this.element.children ).forEach( child => {
-      if ( child.dataset.slide == element.dataset.slide ) {
-        this.activeSlide = child;
-        child.classList.add( this.props.classSlideActive );
-      }
+  setSlides() {
+    this.slides = this.element.querySelectorAll( `.${this.props.classSlide}` );
+    this.dots = this.page.querySelectorAll( 'button' );
+
+    this.slides.forEach( ( slide, index ) => {
+      slide.dataset.slide = index;
     } );
+
+    this.dots.forEach( ( dot, index ) => {
+      dot.dataset.slide = index;
+    } );
+
+    this.setActiveSlide( this.props.initialSlide );
+  }
+
+  unsetSlides() {
+    this.slides.forEach( slide => {
+      delete slide.dataset.slide;
+    } );
+
+    this.activeSlide = null;
   }
 
   addEvents() {
     if ( this.prev ) {
       const tumble = this;
       this.prev.addEventListener( 'click', this.prevSlide = function() {
-        tumble.setSlide( this );
+        tumble.setActiveSlide( this.dataset.slide );
       } );
     }
 
     if ( this.next ) {
       const tumble = this;
       this.next.addEventListener( 'click', this.nextSlide = function() {
-        tumble.setSlide( this );
+        tumble.setActiveSlide( this.dataset.slide );
       } );
     }
 
@@ -149,7 +165,7 @@ class Tumble {
       this.pageSlide = [];
       this.page.querySelectorAll( 'button' ).forEach( button => {
         button.addEventListener( 'click', this.pageSlide[index++] = function() {
-          tumble.setSlide( this );
+          tumble.setActiveSlide( this.dataset.slide );
         } );
       } );
     }
@@ -173,5 +189,58 @@ class Tumble {
       } );
       delete this.pageSlide;
     }
+  }
+
+  getSlide( id ) {
+    let found = null;
+    this.slides.forEach( slide => {
+      if ( slide.dataset.slide == id ) {
+        found = slide;
+      }
+    } );
+    return found;
+  }
+
+  getDot( id ) {
+    let found = null;
+    this.dots.forEach( button => {
+      if ( button.dataset.slide == id ) {
+        found = button;
+      }
+    } );
+    return found;
+  }
+
+  setActiveSlide( id ) {
+    if ( id == this.activeSlide || ! this.getSlide( id ) ) {
+      return false;
+    }
+
+    const currentSlide = this.getSlide( this.activeSlide );
+    const updatedSlide = this.getSlide( id );
+
+    if ( currentSlide ) {
+      currentSlide.classList.remove( this.props.classSlideActive );
+    }
+
+    updatedSlide.classList.add( this.props.classSlideActive );
+
+    if ( this.props.showPagination ) {
+      const currentDot = this.getDot( this.activeSlide );
+      const updatedDot = this.getDot( id );
+
+      if ( currentDot ) {
+        currentDot.parentElement.classList.remove( this.props.classPaginationActive );
+      }
+
+      updatedDot.parentElement.classList.add( this.props.classPaginationActive );
+    }
+
+    this.activeSlide = id;
+
+    this.prev.dataset.slide = 2;
+    this.next.dataset.slide = 1;
+
+    return updatedSlide;
   }
 }
