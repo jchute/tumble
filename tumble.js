@@ -238,8 +238,11 @@ class Tumble {
 
     this.activeSlide = id;
 
-    this.prev.dataset.slide = 2;
-    this.next.dataset.slide = 1;
+    // Update the slide for the Next/Prev button to switch into
+    if ( this.props.showControls ) {
+      this.prev.dataset.slide = this.activeSlide == 0 ? this.slides.length - 1 : parseInt( this.activeSlide ) - 1;
+      this.next.dataset.slide = this.activeSlide == this.slides.length - 1 ? 0 : parseInt( this.activeSlide ) + 1;
+    }
 
     return updatedSlide;
   }
